@@ -44,9 +44,9 @@ namespace OperacoesService.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<OperacaoReadDto>> GetOperacoes()
+        public ActionResult<IEnumerable<OperacaoReadDto>> GetOperacoes(DateTime from, DateTime to)
         {
-            var operacoes = _repository.GetOperacoes();
+            var operacoes = _repository.GetOperacoes(from, to);
             return Ok(_mapper.Map<IEnumerable<OperacaoReadDto>>(operacoes));
         }
     }

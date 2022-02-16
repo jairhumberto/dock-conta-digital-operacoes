@@ -26,9 +26,12 @@ namespace OperacoesService.Data
             return _context.Operacoes.Find(id);
         }
 
-        public IEnumerable<Operacao> GetOperacoes()
+        public IEnumerable<Operacao> GetOperacoes(DateTime from, DateTime to)
         {
-            return _context.Operacoes.ToList();
+            return _context.Operacoes
+                        .Where(e => e.DataHora >= from && e.DataHora <= to)
+                        .OrderByDescending(e => e.DataHora)
+                        .ToList();
         }
 
         public void SaveChanges()

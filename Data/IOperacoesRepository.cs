@@ -6,7 +6,7 @@ namespace OperacoesService.Data
     {
         void CreateOperacao(Operacao operacao);
         Operacao? GetOperacaoById(int id);
-        IEnumerable<Operacao> GetOperacoes();
+        IEnumerable<Operacao> GetOperacoes(DateTime from, DateTime to);
 
         void SaveChanges();
     }
