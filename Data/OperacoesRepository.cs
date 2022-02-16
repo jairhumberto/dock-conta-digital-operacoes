@@ -30,8 +30,7 @@ namespace OperacoesService.Data
         {
             return _context.Operacoes
                         .Where(e => e.DataHora >= from && e.DataHora <= to)
-                        .OrderByDescending(e => e.DataHora)
-                        .ToList();
+                        .OrderByDescending(e => e.DataHora);
         }
 
         public void SaveChanges()

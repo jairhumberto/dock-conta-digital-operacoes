@@ -35,12 +35,12 @@ namespace OperacoesService.Controllers
         {
             var operacao = _repository.GetOperacaoById(id);
 
-            if (operacao != null)
+            if (operacao == null)
             {
-                return Ok(_mapper.Map<OperacaoReadDto>(operacao));
+                return NotFound();
             }
 
-            return NotFound();
+            return Ok(_mapper.Map<OperacaoReadDto>(operacao));
         }
 
         [HttpGet]
