@@ -9,7 +9,9 @@ namespace OperacoesService.Profiles
         public OperacoesProfile()
         {
             CreateMap<Operacao, OperacaoReadDto>();
-            CreateMap<OperacaoCreateDto, Operacao>();
+            CreateMap<OperacaoCreateDto, Operacao>().AfterMap((o,n) => {
+                n.DataHora = DateTime.Now;
+            });
         }
     }
 }
