@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OperacoesService.Data;
+using OperacoesService.SyncDataServices.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,7 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("InMe
 
 builder.Services.AddScoped<IOperacoesRepository, OperacoesRepository>();
 builder.Services.AddScoped<IContasRepository, ContasRepository>();
+builder.Services.AddHttpClient<IContaDataClient, HttpContaDataClient>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

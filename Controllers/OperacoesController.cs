@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OperacoesService.Data;
 using OperacoesService.Dtos;
 using OperacoesService.Models;
+using OperacoesService.SyncDataServices.Http;
 
 namespace OperacoesService.Controllers
 {
@@ -13,16 +14,19 @@ namespace OperacoesService.Controllers
         private readonly IOperacoesRepository _operacoesRepository;
         private readonly IContasRepository _contasRepository;
         private readonly IMapper _mapper;
+        private readonly IContaDataClient _contaDataClient;
 
-        public OperacoesController(IOperacoesRepository operacoesRepository, IContasRepository contasRepository, IMapper mapper)
+        public OperacoesController(IOperacoesRepository operacoesRepository, IContasRepository contasRepository,
+                IMapper mapper, IContaDataClient contaDataClient)
         {
             _operacoesRepository = operacoesRepository;
             _contasRepository = contasRepository;
             _mapper = mapper;
+            _contaDataClient = contaDataClient;
         }
 
         [HttpPost("saque")]
-        public ActionResult<OperacaoReadDto> Saque(string contaNumero, SaqueDto saqueDto)
+        public async Task<ActionResult<OperacaoReadDto>> Saque(string contaNumero, SaqueDto saqueDto)
         {
             var contaModel = _contasRepository.GetContaByNumero(contaNumero);
 
@@ -44,6 +48,9 @@ namespace OperacoesService.Controllers
             var operacaoModel = _mapper.Map<Operacao>(saqueDto);
             operacaoModel.ContaNumero = contaNumero;
 
+            var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
+            await _contaDataClient.SendOperacaoToConta(operacaoReadDto);
+
             _operacoesRepository.CreateOperacao(operacaoModel);
             _operacoesRepository.SaveChanges();
 
@@ -51,7 +58,7 @@ namespace OperacoesService.Controllers
         }
 
         [HttpPost("deposito")]
-        public ActionResult<OperacaoReadDto> Deposito(string contaNumero, DepositoDto depositoDto)
+        public async Task<ActionResult<OperacaoReadDto>> Deposito(string contaNumero, DepositoDto depositoDto)
         {
             var contaModel = _contasRepository.GetContaByNumero(contaNumero);
 
@@ -67,6 +74,9 @@ namespace OperacoesService.Controllers
 
             var operacaoModel = _mapper.Map<Operacao>(depositoDto);
             operacaoModel.ContaNumero = contaNumero;
+
+            var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
+            await _contaDataClient.SendOperacaoToConta(operacaoReadDto);
 
             _operacoesRepository.CreateOperacao(operacaoModel);
             _operacoesRepository.SaveChanges();
