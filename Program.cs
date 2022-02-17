@@ -4,7 +4,9 @@ using OperacoesService.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("InMemory"));
+
 builder.Services.AddScoped<IOperacoesRepository, OperacoesRepository>();
+builder.Services.AddScoped<IContasRepository, ContasRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

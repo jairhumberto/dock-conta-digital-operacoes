@@ -11,5 +11,6 @@ namespace OperacoesService.Data
         }
 
         public DbSet<Operacao> Operacoes { get; set; }
+        public DbSet<Conta> Contas { get; set; }
     }
 }
