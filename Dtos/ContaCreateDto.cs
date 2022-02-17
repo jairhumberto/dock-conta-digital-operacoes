@@ -6,5 +6,14 @@ namespace OperacoesService.Dtos
     {
         [Required]
         public string Numero { get; set; }
+        
+        [Required]
+        public decimal Saldo { get; set; }
+
+        [Required]
+        public bool Ativa { get; set; }
+
+        [Required]
+        public bool Bloqueada { get; set; }
     }
 }

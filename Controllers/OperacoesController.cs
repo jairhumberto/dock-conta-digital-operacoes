@@ -24,9 +24,21 @@ namespace OperacoesService.Controllers
         [HttpPost("saque")]
         public ActionResult<OperacaoReadDto> Saque(string contaNumero, SaqueDto saqueDto)
         {
-            if (_contasRepository.GetContaByNumero(contaNumero) == null)
+            var contaModel = _contasRepository.GetContaByNumero(contaNumero);
+
+            if (contaModel == null)
             {
                 return NotFound("Conta não encontrada");
+            }
+
+            if (!contaModel.Ativa || contaModel.Bloqueada)
+            {
+                return Unauthorized("Conta inativa ou bloqueada");
+            }
+
+            if (contaModel.Saldo < saqueDto.Valor)
+            {
+                return Unauthorized("Saldo insuficiente");
             }
 
             var operacaoModel = _mapper.Map<Operacao>(saqueDto);
@@ -41,9 +53,16 @@ namespace OperacoesService.Controllers
         [HttpPost("deposito")]
         public ActionResult<OperacaoReadDto> Deposito(string contaNumero, DepositoDto depositoDto)
         {
-            if (_contasRepository.GetContaByNumero(contaNumero) == null)
+            var contaModel = _contasRepository.GetContaByNumero(contaNumero);
+
+            if (contaModel == null)
             {
                 return NotFound("Conta não encontrada");
+            }
+
+            if (!contaModel.Ativa || contaModel.Bloqueada)
+            {
+                return Unauthorized("Conta inativa ou bloqueada");
             }
 
             var operacaoModel = _mapper.Map<Operacao>(depositoDto);
