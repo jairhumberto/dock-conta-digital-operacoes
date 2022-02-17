@@ -5,8 +5,8 @@ namespace OperacoesService.Data
     public interface IOperacoesRepository
     {
         void CreateOperacao(Operacao operacao);
-        Operacao? GetOperacaoById(int id);
-        IEnumerable<Operacao> GetOperacoes(DateTime from, DateTime to);
+        Operacao? GetOperacao(string contaNumero, int id);
+        IEnumerable<Operacao> GetOperacoes(string contaNumero, DateTime from, DateTime to);
 
         void SaveChanges();
     }

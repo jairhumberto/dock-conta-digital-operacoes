@@ -21,15 +21,15 @@ namespace OperacoesService.Data
             _context.Operacoes.Add(operacao);
         }
 
-        public Operacao? GetOperacaoById(int id)
+        public Operacao? GetOperacao(string contaNumero, int id)
         {
-            return _context.Operacoes.Find(id);
+            return _context.Operacoes.FirstOrDefault(e => e.ContaNumero == contaNumero && e.Id == id);
         }
 
-        public IEnumerable<Operacao> GetOperacoes(DateTime from, DateTime to)
+        public IEnumerable<Operacao> GetOperacoes(string contaNumero, DateTime from, DateTime to)
         {
             return _context.Operacoes
-                        .Where(e => e.DataHora >= from && e.DataHora <= to)
+                        .Where(e => e.ContaNumero == contaNumero && e.DataHora >= from && e.DataHora <= to)
                         .OrderByDescending(e => e.DataHora);
         }
 
