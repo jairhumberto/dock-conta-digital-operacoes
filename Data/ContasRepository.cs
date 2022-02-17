@@ -21,6 +21,16 @@ namespace OperacoesService.Data
             _context.Contas.Add(conta);
         }
 
+        public void DeleteConta(Conta conta)
+        {
+            if (conta == null)
+            {
+                throw new ArgumentNullException(nameof(conta));
+            }
+
+            _context.Contas.Remove(conta);
+        }
+
         public Conta? GetContaByNumero(string numero)
         {
             return _context.Contas.FirstOrDefault(e => e.Numero == numero);

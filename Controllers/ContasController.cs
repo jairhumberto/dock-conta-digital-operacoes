@@ -22,7 +22,15 @@ namespace OperacoesService.Controllers
         [HttpPost]
         public ActionResult<ContaReadDto> CreateConta(ContaCreateDto contaCreateDto)
         {
-            var contaModel = _mapper.Map<Conta>(contaCreateDto);
+            var contaModel = _repository.GetContaByNumero(contaCreateDto.Numero);
+
+            if (contaModel != null)
+            {
+                _repository.DeleteConta(contaModel);
+                _repository.SaveChanges();
+            }
+
+            contaModel = _mapper.Map<Conta>(contaCreateDto);
 
             _repository.CreateConta(contaModel);
             _repository.SaveChanges();
