@@ -50,6 +50,11 @@ namespace OperacoesService.Controllers
                 return Conflict("Saldo insuficiente");
             }
 
+            if (_operacoesRepository.QuantidadeSacadoNoDia(contaNumero) + saqueDto.Valor > 2000)
+            {
+                return Conflict("O limite diario de saques e 2000 reais");
+            }
+
             var operacaoModel = _mapper.Map<Operacao>(saqueDto);
             operacaoModel.ContaNumero = contaNumero;
 

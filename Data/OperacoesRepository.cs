@@ -33,6 +33,11 @@ namespace OperacoesService.Data
                         .OrderByDescending(e => e.DataHora);
         }
 
+        public decimal QuantidadeSacadoNoDia(string contaNumero)
+        {
+            return _context.Operacoes.Where(e => e.DataHora >= DateTime.Today && "saque" == e.Tipo).Sum(e => e.Valor);
+        }
+
         public void SaveChanges()
         {
             _context.SaveChanges();
