@@ -14,15 +14,15 @@ namespace OperacoesService.Controllers
         private readonly IOperacoesRepository _operacoesRepository;
         private readonly IContasRepository _contasRepository;
         private readonly IMapper _mapper;
-        private readonly IContaDataClient _contaDataClient;
+        private readonly IContasServiceClient _contasServiceClient;
 
         public OperacoesController(IOperacoesRepository operacoesRepository, IContasRepository contasRepository,
-                IMapper mapper, IContaDataClient contaDataClient)
+                IMapper mapper, IContasServiceClient contasServiceClient)
         {
             _operacoesRepository = operacoesRepository;
             _contasRepository = contasRepository;
             _mapper = mapper;
-            _contaDataClient = contaDataClient;
+            _contasServiceClient = contasServiceClient;
         }
 
         [HttpPost("saque")]
@@ -32,13 +32,20 @@ namespace OperacoesService.Controllers
 
             if (contaModel == null)
             {
-                return NotFound("Conta não encontrada");
+                return NotFound("Conta nao cadastrada");
             }
 
             if (!contaModel.Ativa || contaModel.Bloqueada)
             {
                 return Unauthorized("Conta inativa ou bloqueada");
             }
+
+            if (saqueDto.Valor <= 0)
+            {
+                return BadRequest("Valor invalido");
+            }
+
+            Console.WriteLine($"Saldo Atual ---> {contaModel.Saldo}");
 
             if (contaModel.Saldo < saqueDto.Valor)
             {
@@ -49,12 +56,14 @@ namespace OperacoesService.Controllers
             operacaoModel.ContaNumero = contaNumero;
 
             var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
-            await _contaDataClient.SendOperacaoToConta(operacaoReadDto);
+            Console.WriteLine($"Saque ---> {operacaoReadDto.Valor}");
+            await _contasServiceClient.ProcessaOperacao(operacaoReadDto);
 
             _operacoesRepository.CreateOperacao(operacaoModel);
             _operacoesRepository.SaveChanges();
 
-            return CreatedAtRoute(nameof(GetOperacao), new { ContaNumero = contaNumero, Id = operacaoModel.Id }, _mapper.Map<OperacaoReadDto>(operacaoModel));
+            return CreatedAtRoute(nameof(GetOperacao), new { ContaNumero = contaNumero, Id = operacaoModel.Id },
+                    _mapper.Map<OperacaoReadDto>(operacaoModel));
         }
 
         [HttpPost("deposito")]
@@ -64,7 +73,7 @@ namespace OperacoesService.Controllers
 
             if (contaModel == null)
             {
-                return NotFound("Conta não encontrada");
+                return NotFound("Conta nao cadastrada");
             }
 
             if (!contaModel.Ativa || contaModel.Bloqueada)
@@ -72,16 +81,26 @@ namespace OperacoesService.Controllers
                 return Unauthorized("Conta inativa ou bloqueada");
             }
 
+            if (depositoDto.Valor <= 0)
+            {
+                return BadRequest("Valor invalido");
+            }
+
             var operacaoModel = _mapper.Map<Operacao>(depositoDto);
             operacaoModel.ContaNumero = contaNumero;
 
+
+
+
             var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
-            await _contaDataClient.SendOperacaoToConta(operacaoReadDto);
+            Console.WriteLine($"Deposito ---> {operacaoReadDto.Valor}");
+            await _contasServiceClient.ProcessaOperacao(operacaoReadDto);
 
             _operacoesRepository.CreateOperacao(operacaoModel);
             _operacoesRepository.SaveChanges();
 
-            return CreatedAtRoute(nameof(GetOperacao), new { ContaNumero = contaNumero, Id = operacaoModel.Id }, _mapper.Map<OperacaoReadDto>(operacaoModel));
+            return CreatedAtRoute(nameof(GetOperacao), new { ContaNumero = contaNumero, Id = operacaoModel.Id },
+                    _mapper.Map<OperacaoReadDto>(operacaoModel));
         }
 
         [HttpGet("{id}", Name="GetOperacao")]
@@ -89,13 +108,14 @@ namespace OperacoesService.Controllers
         {
             if (_contasRepository.GetContaByNumero(contaNumero) == null)
             {
-                return NotFound("Conta não encontrada");
+                return NotFound("Conta nao cadastrada");
             }
 
             var operacaoModel = _operacoesRepository.GetOperacao(contaNumero, id);
+
             if (operacaoModel == null)
             {
-                return NotFound("Operacao não encontrada");
+                return NotFound("Operacao nao encontrada");
             }
 
             return Ok(_mapper.Map<OperacaoReadDto>(operacaoModel));
@@ -106,11 +126,11 @@ namespace OperacoesService.Controllers
         {
             if (_contasRepository.GetContaByNumero(contaNumero) == null)
             {
-                return NotFound("Conta não encontrada");
+                return NotFound("Conta nao cadastrada");
             }
 
-            var operacoes = _operacoesRepository.GetOperacoes(contaNumero, from, to);
-            return Ok(_mapper.Map<IEnumerable<OperacaoReadDto>>(operacoes));
+            var operacoesModels = _operacoesRepository.GetOperacoes(contaNumero, from, to);
+            return Ok(_mapper.Map<IEnumerable<OperacaoReadDto>>(operacoesModels));
         }
     }
 }

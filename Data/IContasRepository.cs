@@ -7,7 +7,6 @@ namespace OperacoesService.Data
         void CreateConta(Conta conta);
         void DeleteConta(Conta conta);
         Conta? GetContaByNumero(string numero);
-        IEnumerable<Conta> GetContas();
 
         void SaveChanges();
     }

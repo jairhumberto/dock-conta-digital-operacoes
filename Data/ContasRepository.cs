@@ -36,11 +36,6 @@ namespace OperacoesService.Data
             return _context.Contas.FirstOrDefault(e => e.Numero == numero);
         }
 
-        public IEnumerable<Conta> GetContas()
-        {
-            return _context.Contas;
-        }
-
         public void SaveChanges()
         {
             _context.SaveChanges();

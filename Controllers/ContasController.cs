@@ -10,39 +10,31 @@ namespace OperacoesService.Controllers
     [ApiController]
     public class ContasController : ControllerBase
     {
-        private readonly IContasRepository _repository;
+        private readonly IContasRepository _contasRepository;
         private readonly IMapper _mapper;
 
-        public ContasController(IContasRepository repository, IMapper mapper)
+        public ContasController(IContasRepository contasRepository, IMapper mapper)
         {
-            _repository = repository;
+            _contasRepository = contasRepository;
             _mapper = mapper;
         }
 
         [HttpPost]
-        public ActionResult<ContaReadDto> CreateConta(ContaCreateDto contaCreateDto)
+        public ActionResult CreateConta(ContaCreateDto contaCreateDto)
         {
-            var contaModel = _repository.GetContaByNumero(contaCreateDto.Numero);
+            var contaModel = _contasRepository.GetContaByNumero(contaCreateDto.Numero);
 
             if (contaModel != null)
             {
-                _repository.DeleteConta(contaModel);
-                _repository.SaveChanges();
+                _contasRepository.DeleteConta(contaModel);
             }
 
             contaModel = _mapper.Map<Conta>(contaCreateDto);
 
-            _repository.CreateConta(contaModel);
-            _repository.SaveChanges();
+            _contasRepository.CreateConta(contaModel);
+            _contasRepository.SaveChanges();
 
-            return Ok(_mapper.Map<ContaReadDto>(contaModel));
-        }
-
-        [HttpGet]
-        public ActionResult<IEnumerable<ContaReadDto>> GetContas()
-        {
-            var contas = _repository.GetContas();
-            return Ok(_mapper.Map<IEnumerable<ContaReadDto>>(contas));
+            return NoContent();
         }
     }
 }
