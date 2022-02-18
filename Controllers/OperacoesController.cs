@@ -37,7 +37,7 @@ namespace OperacoesService.Controllers
 
             if (!contaModel.Ativa || contaModel.Bloqueada)
             {
-                return Unauthorized("Conta inativa ou bloqueada");
+                return Conflict("Conta inativa ou bloqueada");
             }
 
             if (saqueDto.Valor <= 0)
@@ -45,18 +45,15 @@ namespace OperacoesService.Controllers
                 return BadRequest("Valor invalido");
             }
 
-            Console.WriteLine($"Saldo Atual ---> {contaModel.Saldo}");
-
             if (contaModel.Saldo < saqueDto.Valor)
             {
-                return Unauthorized("Saldo insuficiente");
+                return Conflict("Saldo insuficiente");
             }
 
             var operacaoModel = _mapper.Map<Operacao>(saqueDto);
             operacaoModel.ContaNumero = contaNumero;
 
             var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
-            Console.WriteLine($"Saque ---> {operacaoReadDto.Valor}");
             await _contasServiceClient.ProcessaOperacao(operacaoReadDto);
 
             _operacoesRepository.CreateOperacao(operacaoModel);
@@ -78,7 +75,7 @@ namespace OperacoesService.Controllers
 
             if (!contaModel.Ativa || contaModel.Bloqueada)
             {
-                return Unauthorized("Conta inativa ou bloqueada");
+                return Conflict("Conta inativa ou bloqueada");
             }
 
             if (depositoDto.Valor <= 0)
@@ -89,11 +86,7 @@ namespace OperacoesService.Controllers
             var operacaoModel = _mapper.Map<Operacao>(depositoDto);
             operacaoModel.ContaNumero = contaNumero;
 
-
-
-
             var operacaoReadDto = _mapper.Map<OperacaoReadDto>(operacaoModel);
-            Console.WriteLine($"Deposito ---> {operacaoReadDto.Valor}");
             await _contasServiceClient.ProcessaOperacao(operacaoReadDto);
 
             _operacoesRepository.CreateOperacao(operacaoModel);
